@@ -1,19 +1,33 @@
 pipeline {
-  agent none
+  agent {
+    docker {
+      image 'node:6-alpine'
+      args '-p 3000:3000'
+    }
+
+  }
   stages {
-    stage('Build and Test') {
-      agent {
-        docker {
-          image 'node:6-alpine'
-          args '-p 3000:3000'
-        }
-      }
+    stage('Build') {
       steps {
         script {
-          // Run the container and specify the custom network
           docker.image('node:6-alpine').withRun("--network my_custom_network -p 3000:3000", 'npm install')
           sh './jenkins/scripts/test.sh'
         }
+      }
+    }
+    stage('Test') {
+      environment {
+        CI = 'true'
+      }
+      steps {
+        sh './jenkins/scripts/test.sh'
+      }
+    }
+    stage('Deliver') {
+      steps {
+        sh './jenkins/scripts/deliver.sh'
+        input 'Finished using the web site? (Click "Proceed" to continue)'
+        sh './jenkins/scripts/kill.sh'
       }
     }
   }
