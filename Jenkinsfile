@@ -9,7 +9,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'echo "104.16.24.34 registry.npmjs.org" >> /etc/hosts && npm install'
+        sh 'npm install'
       }
     }
     stage('Test') {
