@@ -9,10 +9,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        script {
-          docker.image('node:6-alpine').withRun("--network my_custom_network -p 3000:3000", 'npm install')
-          sh './jenkins/scripts/test.sh'
-        }
+        sh 'npm install'
       }
     }
     stage('Test') {
