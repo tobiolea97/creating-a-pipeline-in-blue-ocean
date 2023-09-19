@@ -1,31 +1,17 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:6-alpine'
-      args '-p 3000:3000'
-      customDns '76.252.93.21'
-    }
-
-  }
+  agent none
   stages {
-    stage('Build') {
+    stage('Build and Test') {
+      agent {
+        docker {
+          image 'node:6-alpine'
+          args '-p 3000:3000'
+          network 'my_custom_network'
+        }
+      }
       steps {
         sh 'npm install'
-      }
-    }
-    stage('Test') {
-      environment {
-        CI = 'true'
-      }
-      steps {
         sh './jenkins/scripts/test.sh'
-      }
-    }
-    stage('Deliver') {
-      steps {
-        sh './jenkins/scripts/deliver.sh'
-        input 'Finished using the web site? (Click "Proceed" to continue)'
-        sh './jenkins/scripts/kill.sh'
       }
     }
   }
